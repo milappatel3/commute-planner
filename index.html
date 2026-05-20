@@ -441,6 +441,13 @@
                 <div id="bart-timeline" class="timeline"></div>
             </div>
 
+            <!-- Morning Trains -->
+            <div class="card">
+                <h2>Available Morning Trains</h2>
+                <div id="live-morning-trains"></div>
+                <div class="api-status" id="morning-api-status">Loading trains...</div>
+            </div>
+
             <!-- Collapsible Details -->
             <button class="details-toggle" id="bart-details-toggle">
                 Commute Details
@@ -697,7 +704,9 @@
             ];
 
             renderTimeline('bart-timeline', timeline);
-            // Evening trains now use live BART API data
+
+            // Display morning trains with recommended one highlighted
+            displayLiveMorningTrains(liveTrains, selectedTrain);
         }
 
         // Drive calculations
@@ -818,6 +827,51 @@
                 console.error('Morning train API error:', error);
                 return null;
             }
+        }
+
+        function displayLiveMorningTrains(trains, recommendedTrain) {
+            const morningTrainsEl = document.getElementById('live-morning-trains');
+            const statusEl = document.getElementById('morning-api-status');
+
+            if (!trains || trains.length === 0) {
+                morningTrainsEl.innerHTML =
+                    '<p style="text-align: center; color: #64748b; padding: 20px;">Using static schedule</p>';
+                statusEl.textContent = 'Enter API key in Details for live times';
+                return;
+            }
+
+            const now = new Date();
+            const html = trains.slice(0, 5).map((train) => {
+                const isRecommended = recommendedTrain &&
+                    train.depart === recommendedTrain.depart &&
+                    train.arrive === recommendedTrain.arrive;
+
+                const className = isRecommended ? 'next' : 'upcoming';
+
+                const minutesText = train.minutes === 0 ? 'Leaving now!' :
+                                   train.minutes === 1 ? 'in 1 minute' :
+                                   `in ${train.minutes} minutes`;
+
+                const action = isRecommended ?
+                    '⭐ Your recommended train' :
+                    `Alternative option`;
+
+                return `
+                    <div class="live-train ${className}">
+                        <div class="train-header">
+                            <div class="train-destination">Milpitas → Montgomery</div>
+                            <div class="train-countdown">${minutesText}</div>
+                        </div>
+                        <div class="train-times">
+                            Departs: ${formatTime(train.depart)} • Arrives: ${formatTime(train.arrive)}
+                        </div>
+                        <div class="train-action">${action}</div>
+                    </div>
+                `;
+            }).join('');
+
+            morningTrainsEl.innerHTML = html;
+            statusEl.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
         }
 
         async function fetchLiveBARTTimes() {
