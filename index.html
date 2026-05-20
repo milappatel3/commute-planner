@@ -765,8 +765,8 @@
             try {
                 document.getElementById('bart-api-status').textContent = 'Fetching live data...';
 
-                // Milpitas station code: MLPT
-                const url = `https://api.bart.gov/api/etd.aspx?cmd=etd&orig=MLPT&key=${apiKey}&json=y`;
+                // Evening trains: Montgomery station (MONT) going to South Bay
+                const url = `https://api.bart.gov/api/etd.aspx?cmd=etd&orig=MONT&key=${apiKey}&json=y`;
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -792,10 +792,11 @@
             const station = data.root.station[0];
             if (station.etd) {
                 station.etd.forEach(destination => {
-                    // Only show SF-bound trains (to Montgomery/Downtown SF)
-                    if (destination.destination.includes('San Francisco') ||
-                        destination.destination.includes('SF') ||
-                        destination.destination.includes('Antioch')) {
+                    // Only show South Bay-bound trains (to Milpitas, Berryessa, Warm Springs)
+                    if (destination.destination.includes('Milpitas') ||
+                        destination.destination.includes('Berryessa') ||
+                        destination.destination.includes('Warm Springs') ||
+                        destination.destination.includes('Fremont')) {
 
                         destination.estimate.forEach(est => {
                             const minutes = est.minutes === 'Leaving' ? 0 : parseInt(est.minutes);
@@ -820,7 +821,7 @@
             // Display trains
             if (trains.length === 0) {
                 document.getElementById('live-evening-trains').innerHTML =
-                    '<p style="text-align: center; color: #64748b; padding: 20px;">No SF-bound trains found</p>';
+                    '<p style="text-align: center; color: #64748b; padding: 20px;">No South Bay-bound trains found</p>';
                 return;
             }
 
