@@ -455,6 +455,7 @@
             <!-- Schedule (Main Focus) -->
             <div class="card">
                 <h2>Your Schedule</h2>
+                <div id="bart-schedule-status" class="api-status" style="margin-bottom: 16px;"></div>
                 <div id="bart-timeline" class="timeline"></div>
             </div>
 
@@ -718,6 +719,22 @@
             ];
 
             renderTimeline('bart-timeline', timeline);
+
+            // Update schedule status indicator
+            const statusEl = document.getElementById('bart-schedule-status');
+            const currentHour = new Date().getHours();
+            const isMorningHours = currentHour >= 6 && currentHour < 10;
+
+            if (liveTrains && liveTrains.length > 0) {
+                statusEl.textContent = '✅ Using live train data';
+                statusEl.style.color = '#10b981';
+            } else if (isMorningHours) {
+                statusEl.textContent = '⚠️ Live data unavailable - using static schedule';
+                statusEl.style.color = '#f59e0b';
+            } else {
+                statusEl.textContent = 'ℹ️ Using static schedule (live data available 6 AM - 10 AM)';
+                statusEl.style.color = '#64748b';
+            }
         }
 
         // Drive calculations
