@@ -173,6 +173,23 @@
             color: #64748b;
         }
 
+        .timeline-detail {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .live-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+
         .train-schedule {
             margin-top: 20px;
         }
@@ -441,13 +458,6 @@
                 <div id="bart-timeline" class="timeline"></div>
             </div>
 
-            <!-- Morning Trains -->
-            <div class="card">
-                <h2>Available Morning Trains</h2>
-                <div id="live-morning-trains"></div>
-                <div class="api-status" id="morning-api-status">Loading trains...</div>
-            </div>
-
             <!-- Collapsible Details -->
             <button class="details-toggle" id="bart-details-toggle">
                 Commute Details
@@ -691,22 +701,23 @@
             const wakeUpTime = leaveHomeTime - prep;
 
             const trainLabel = selectedTrain.isLive ?
-                `Board train (Milpitas) - Live` :
-                `Board train (Milpitas)`;
+                `Board train from Milpitas<span class="live-badge">LIVE</span>` :
+                `Board train from Milpitas`;
+
+            const trainDetail = selectedTrain.isLive ?
+                `Departs ${formatTime(selectedTrain.depart)} → Arrives Montgomery ${formatTime(selectedTrain.arrive)}` :
+                null;
 
             const timeline = [
                 { emoji: '⏰', time: minutesToTime(wakeUpTime), label: 'Wake up' },
                 { emoji: '🏠', time: minutesToTime(leaveHomeTime), label: 'Leave home' },
                 { emoji: '🚗', time: minutesToTime(leaveHomeTime + driveTime), label: 'Arrive at BART station' },
-                { emoji: '🚆', time: selectedTrain.depart, label: trainLabel },
+                { emoji: '🚆', time: selectedTrain.depart, label: trainLabel, detail: trainDetail },
                 { emoji: '🏢', time: selectedTrain.arrive, label: 'Arrive Montgomery' },
                 { emoji: '✅', time: minutesToTime(targetArrival), label: 'Arrive at office' }
             ];
 
             renderTimeline('bart-timeline', timeline);
-
-            // Display morning trains with recommended one highlighted
-            displayLiveMorningTrains(liveTrains, selectedTrain);
         }
 
         // Drive calculations
@@ -736,6 +747,7 @@
                     <div class="timeline-content">
                         <div class="timeline-time">${formatTime(item.time)}</div>
                         <div class="timeline-label">${item.label}</div>
+                        ${item.detail ? `<div class="timeline-detail">${item.detail}</div>` : ''}
                     </div>
                 </div>
             `).join('');
