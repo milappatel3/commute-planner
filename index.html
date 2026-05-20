@@ -444,19 +444,22 @@
 
         <!-- BART Mode -->
         <div id="bart-mode" class="mode-content active">
-            <!-- Target Arrival (Prominent) -->
-            <div class="target-arrival">
-                <label for="bart-target">Target arrival at office</label>
-                <input type="time" id="bart-target" value="09:00">
-            </div>
+            <!-- Morning Section -->
+            <div id="morning-section">
+                <!-- Target Arrival (Prominent) -->
+                <div class="target-arrival">
+                    <label for="bart-target">Target arrival at office</label>
+                    <input type="time" id="bart-target" value="09:00">
+                </div>
 
-            <div id="bart-error" class="error" style="display: none;"></div>
+                <div id="bart-error" class="error" style="display: none;"></div>
 
-            <!-- Schedule (Main Focus) -->
-            <div class="card">
-                <h2>Your Schedule</h2>
-                <div id="bart-schedule-status" class="api-status" style="margin-bottom: 16px;"></div>
-                <div id="bart-timeline" class="timeline"></div>
+                <!-- Schedule (Main Focus) -->
+                <div class="card">
+                    <h2>Your Schedule</h2>
+                    <div id="bart-schedule-status" class="api-status" style="margin-bottom: 16px;"></div>
+                    <div id="bart-timeline" class="timeline"></div>
+                </div>
             </div>
 
             <!-- Collapsible Details -->
@@ -492,13 +495,15 @@
                 </div>
             </div>
 
-            <!-- Evening Trains -->
-            <div class="card">
-                <h2>Evening Trains</h2>
-                <div class="current-time" id="current-time">Loading...</div>
-                <div id="service-advisory" style="display: none;" class="service-advisory"></div>
-                <div id="live-evening-trains"></div>
-                <div class="api-status" id="bart-api-status">Connecting to BART API...</div>
+            <!-- Evening Section -->
+            <div id="evening-section">
+                <div class="card">
+                    <h2>Evening Trains</h2>
+                    <div class="current-time" id="current-time">Loading...</div>
+                    <div id="service-advisory" style="display: none;" class="service-advisory"></div>
+                    <div id="live-evening-trains"></div>
+                    <div class="api-status" id="bart-api-status">Connecting to BART API...</div>
+                </div>
             </div>
         </div>
 
@@ -1079,6 +1084,47 @@
             }
         }
 
+        // Time-based layout adjustment
+        function adjustLayoutBasedOnTime() {
+            const currentHour = new Date().getHours();
+            const isAfternoon = currentHour >= 12; // Noon onwards
+
+            const morningSection = document.getElementById('morning-section');
+            const eveningSection = document.getElementById('evening-section');
+            const bartMode = document.getElementById('bart-mode');
+
+            if (isAfternoon) {
+                // Afternoon mode: Evening trains first, hide morning schedule
+                morningSection.style.display = 'none';
+
+                // Move evening section to top if not already
+                if (eveningSection && morningSection && eveningSection.previousElementSibling !== null) {
+                    bartMode.insertBefore(eveningSection, bartMode.firstChild.nextSibling); // After details toggle
+                }
+
+                // Add afternoon mode indicator
+                const afternoonBadge = document.createElement('div');
+                afternoonBadge.id = 'afternoon-mode-badge';
+                afternoonBadge.className = 'info-badge';
+                afternoonBadge.style.marginBottom = '16px';
+                afternoonBadge.innerHTML = '🌆 Afternoon mode - Showing evening trains • <a href="#" onclick="document.getElementById(\'morning-section\').style.display=\'block\'; this.parentElement.style.display=\'none\'; return false;" style="color: #1e40af; text-decoration: underline;">Show morning schedule</a>';
+
+                // Only add if not already present
+                if (!document.getElementById('afternoon-mode-badge')) {
+                    bartMode.insertBefore(afternoonBadge, eveningSection);
+                }
+            } else {
+                // Morning mode: Normal order, show both sections
+                morningSection.style.display = 'block';
+
+                // Remove afternoon badge if present
+                const afternoonBadge = document.getElementById('afternoon-mode-badge');
+                if (afternoonBadge) {
+                    afternoonBadge.remove();
+                }
+            }
+        }
+
         // Event listeners
         document.querySelectorAll('#bart-mode input').forEach(input => {
             input.addEventListener('input', () => {
@@ -1123,6 +1169,8 @@
         calculateBARTSchedule();
         calculateDriveSchedule();
         startBARTUpdates(); // Start live BART updates
+        adjustLayoutBasedOnTime(); // Set initial layout based on time
+        setInterval(adjustLayoutBasedOnTime, 60000); // Check every minute for time changes
     </script>
 </body>
 </html>
