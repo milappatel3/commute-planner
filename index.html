@@ -498,8 +498,8 @@
             </div>
 
             <!-- Settings Section (Bottom) -->
-            <button class="details-toggle" id="bart-details-toggle" style="margin-top: 24px;">
-                ⚙️ Settings
+            <button class="details-toggle" id="bart-details-toggle" style="margin-top: 24px; opacity: 0.7;">
+                ⚙️ Settings (Advanced)
             </button>
             <div class="details-content" id="bart-details-content">
 
@@ -1167,6 +1167,12 @@
         startBARTUpdates(); // Start live BART updates
         adjustLayoutBasedOnTime(); // Set initial layout based on time
         setInterval(adjustLayoutBasedOnTime, 60000); // Check every minute for time changes
+
+        // Ensure settings sections stay closed by default
+        document.getElementById('bart-details-content').classList.remove('open');
+        document.getElementById('bart-details-toggle').classList.remove('open');
+        document.getElementById('drive-details-content').classList.remove('open');
+        document.getElementById('drive-details-toggle').classList.remove('open');
     </script>
 </body>
 </html>
