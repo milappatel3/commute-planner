@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Commute">
@@ -18,8 +18,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
+            background: #0f172a;
+            color: #e2e8f0;
             padding: 0;
             min-height: 100vh;
         }
@@ -34,17 +34,17 @@
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 20px;
-            color: #0f172a;
+            color: #f1f5f9;
         }
 
         .mode-toggle {
             display: flex;
             gap: 8px;
             margin-bottom: 24px;
-            background: white;
+            background: #1e293b;
             padding: 4px;
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
         .mode-toggle button {
@@ -57,11 +57,11 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            color: #64748b;
+            color: #94a3b8;
         }
 
         .mode-toggle button.active {
-            background: #2563eb;
+            background: #3b82f6;
             color: white;
         }
 
@@ -74,18 +74,19 @@
         }
 
         .card {
-            background: white;
+            background: #1e293b;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            border: 1px solid #334155;
         }
 
         .card h2 {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 16px;
-            color: #0f172a;
+            color: #f1f5f9;
         }
 
         .input-group {
@@ -101,7 +102,7 @@
             font-size: 14px;
             font-weight: 500;
             margin-bottom: 6px;
-            color: #475569;
+            color: #94a3b8;
         }
 
         input[type="number"],
@@ -109,17 +110,18 @@
         input[type="password"] {
             width: 100%;
             padding: 12px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #334155;
             border-radius: 8px;
             font-size: 16px;
-            background: #f8fafc;
+            background: #0f172a;
+            color: #e2e8f0;
             transition: all 0.2s;
         }
 
         input:focus {
             outline: none;
-            border-color: #2563eb;
-            background: white;
+            border-color: #3b82f6;
+            background: #1e293b;
         }
 
         .timeline {
@@ -140,14 +142,14 @@
             top: 40px;
             width: 2px;
             height: calc(100% - 20px);
-            background: #e2e8f0;
+            background: #334155;
         }
 
         .timeline-dot {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #2563eb;
+            background: #3b82f6;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -164,18 +166,18 @@
         .timeline-time {
             font-size: 20px;
             font-weight: 700;
-            color: #0f172a;
+            color: #f1f5f9;
             margin-bottom: 4px;
         }
 
         .timeline-label {
             font-size: 14px;
-            color: #64748b;
+            color: #94a3b8;
         }
 
         .timeline-detail {
             font-size: 12px;
-            color: #94a3b8;
+            color: #64748b;
             margin-top: 4px;
         }
 
@@ -202,21 +204,22 @@
         }
 
         .train-card {
-            background: #f1f5f9;
+            background: #0f172a;
             padding: 12px;
             border-radius: 8px;
             text-align: center;
+            border: 1px solid #334155;
         }
 
         .train-card.highlight {
-            background: #dbeafe;
-            border: 2px solid #2563eb;
+            background: #1e3a8a;
+            border: 2px solid #3b82f6;
         }
 
         .train-time {
             font-size: 16px;
             font-weight: 600;
-            color: #0f172a;
+            color: #f1f5f9;
         }
 
         .train-arrow {
@@ -234,8 +237,8 @@
         }
 
         .install-prompt {
-            background: #dbeafe;
-            border: 1px solid #2563eb;
+            background: #1e3a8a;
+            border: 1px solid #3b82f6;
             padding: 12px 16px;
             border-radius: 8px;
             margin-bottom: 16px;
@@ -246,7 +249,7 @@
         }
 
         .install-prompt button {
-            background: #2563eb;
+            background: #3b82f6;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -258,7 +261,7 @@
         .card h3 {
             font-size: 16px;
             font-weight: 600;
-            color: #0f172a;
+            color: #f1f5f9;
         }
 
         .card input[type="time"] {
@@ -267,8 +270,8 @@
         }
 
         .details-toggle {
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: #1e293b;
+            border: 1px solid #334155;
             width: 100%;
             padding: 14px 16px;
             border-radius: 12px;
@@ -279,13 +282,13 @@
             justify-content: space-between;
             font-size: 15px;
             font-weight: 500;
-            color: #64748b;
+            color: #94a3b8;
             transition: all 0.2s;
         }
 
         .details-toggle:hover {
-            border-color: #2563eb;
-            color: #2563eb;
+            border-color: #3b82f6;
+            color: #3b82f6;
         }
 
         .details-toggle::after {
@@ -312,16 +315,17 @@
             text-align: center;
             font-size: 18px;
             font-weight: 600;
-            color: #0f172a;
+            color: #f1f5f9;
             margin-bottom: 20px;
             padding: 12px;
-            background: #f1f5f9;
+            background: #0f172a;
             border-radius: 8px;
+            border: 1px solid #334155;
         }
 
         .live-train {
-            background: white;
-            border: 2px solid #e2e8f0;
+            background: #1e293b;
+            border: 2px solid #334155;
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
@@ -330,12 +334,12 @@
 
         .live-train.next {
             border-color: #ef4444;
-            background: #fef2f2;
+            background: #7f1d1d;
         }
 
         .live-train.upcoming {
             border-color: #3b82f6;
-            background: #eff6ff;
+            background: #1e3a8a;
         }
 
         .train-header {
@@ -348,7 +352,7 @@
         .train-destination {
             font-size: 18px;
             font-weight: 700;
-            color: #0f172a;
+            color: #f1f5f9;
         }
 
         .train-countdown {
@@ -381,14 +385,14 @@
         }
 
         .live-train.upcoming .train-action {
-            background: #dbeafe;
-            color: #1e40af;
+            background: #1e3a8a;
+            color: #93c5fd;
         }
 
         .service-advisory {
-            background: #fef3c7;
+            background: #422006;
             border: 1px solid #fbbf24;
-            color: #92400e;
+            color: #fde68a;
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 16px;
@@ -403,7 +407,7 @@
         }
 
         .view-toggle {
-            background: #f1f5f9;
+            background: #1e293b;
             border-radius: 8px;
             padding: 8px 12px;
             margin-bottom: 16px;
@@ -411,7 +415,8 @@
             align-items: center;
             justify-content: space-between;
             font-size: 14px;
-            color: #64748b;
+            color: #94a3b8;
+            border: 1px solid #334155;
         }
 
         .view-toggle-buttons {
@@ -420,26 +425,26 @@
         }
 
         .view-toggle button {
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: #0f172a;
+            border: 1px solid #334155;
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
-            color: #64748b;
+            color: #94a3b8;
         }
 
         .view-toggle button.active {
-            background: #2563eb;
+            background: #3b82f6;
             color: white;
-            border-color: #2563eb;
+            border-color: #3b82f6;
         }
 
         .view-toggle button:hover:not(.active) {
-            border-color: #2563eb;
-            color: #2563eb;
+            border-color: #3b82f6;
+            color: #3b82f6;
         }
 
         @media (max-width: 480px) {
@@ -613,12 +618,12 @@
             short_name: 'Commute',
             start_url: '.',
             display: 'standalone',
-            background_color: '#f8fafc',
-            theme_color: '#2563eb',
+            background_color: '#0f172a',
+            theme_color: '#0f172a',
             description: 'Plan your daily commute',
             icons: [
                 {
-                    src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%232563eb" width="100" height="100" rx="20"/><text x="50" y="70" font-size="60" text-anchor="middle" fill="white">🚆</text></svg>',
+                    src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%230f172a" width="100" height="100" rx="20"/><text x="50" y="70" font-size="60" text-anchor="middle" fill="white">🚆</text></svg>',
                     sizes: '512x512',
                     type: 'image/svg+xml'
                 }
@@ -632,7 +637,7 @@
         // Service Worker
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_VERSION = 'v2';
+                const CACHE_VERSION = 'v3';
 
                 self.addEventListener('install', (e) => {
                     self.skipWaiting();
