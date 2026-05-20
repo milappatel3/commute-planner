@@ -255,26 +255,15 @@
             cursor: pointer;
         }
 
-        .target-arrival {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .target-arrival label {
+        .card h3 {
             font-size: 16px;
             font-weight: 600;
-            margin-bottom: 12px;
             color: #0f172a;
         }
 
-        .target-arrival input[type="time"] {
-            font-size: 24px;
-            font-weight: 700;
-            padding: 16px;
-            text-align: center;
+        .card input[type="time"] {
+            font-size: 20px;
+            font-weight: 600;
         }
 
         .details-toggle {
@@ -446,27 +435,29 @@
         <div id="bart-mode" class="mode-content active">
             <!-- Morning Section -->
             <div id="morning-section">
-                <!-- Target Arrival (Prominent) -->
-                <div class="target-arrival">
-                    <label for="bart-target">Target arrival at office</label>
-                    <input type="time" id="bart-target" value="09:00">
-                </div>
-
-                <div id="bart-error" class="error" style="display: none;"></div>
-
-                <!-- Schedule (Main Focus) -->
+                <!-- Morning Commute Card -->
                 <div class="card">
-                    <h2>Your Schedule</h2>
-                    <div id="bart-schedule-status" class="api-status" style="margin-bottom: 16px;"></div>
-                    <div id="bart-timeline" class="timeline"></div>
+                    <h2>Morning Commute</h2>
+
+                    <!-- Target Arrival -->
+                    <div class="input-group">
+                        <label for="bart-target">Target arrival at office</label>
+                        <input type="time" id="bart-target" value="09:00">
+                    </div>
+
+                    <div id="bart-error" class="error" style="display: none; margin-top: 16px;"></div>
+
+                    <!-- Schedule -->
+                    <div style="margin-top: 20px;">
+                        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Your Schedule</h3>
+                        <div id="bart-schedule-status" class="api-status" style="margin-bottom: 16px;"></div>
+                        <div id="bart-timeline" class="timeline"></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Collapsible Details -->
-            <button class="details-toggle" id="bart-details-toggle">
-                Commute Details
-            </button>
-            <div class="details-content" id="bart-details-content">
+            <!-- Evening Section -->
+            <div id="evening-section">
                 <div class="card" style="margin-top: 0;">
                     <div class="input-group">
                         <label for="bart-prep">Morning prep (minutes)</label>
@@ -505,7 +496,12 @@
                     <div class="api-status" id="bart-api-status">Connecting to BART API...</div>
                 </div>
             </div>
-        </div>
+
+            <!-- Settings Section (Bottom) -->
+            <button class="details-toggle" id="bart-details-toggle" style="margin-top: 24px;">
+                ⚙️ Settings
+            </button>
+            <div class="details-content" id="bart-details-content">
 
         <!-- Drive Mode -->
         <div id="drive-mode" class="mode-content">
