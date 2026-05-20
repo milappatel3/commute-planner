@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Commute">
+    <title>Commute Planner</title>
+    <link rel="manifest" id="manifest-placeholder">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #0f172a;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: white;
+            padding: 4px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .mode-toggle button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #64748b;
+        }
+
+        .mode-toggle button.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .mode-content {
+            display: none;
+        }
+
+        .mode-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #0f172a;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #475569;
+        }
+
+        input[type="number"],
+        input[type="time"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: white;
+        }
+
+        .timeline {
+            margin-top: 20px;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 40px;
+            width: 2px;
+            height: calc(100% - 20px);
+            background: #e2e8f0;
+        }
+
+        .timeline-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .timeline-content {
+            margin-left: 16px;
+            flex: 1;
+        }
+
+        .timeline-time {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .timeline-label {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .train-schedule {
+            margin-top: 20px;
+        }
+
+        .train-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .train-card {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .train-card.highlight {
+            background: #dbeafe;
+            border: 2px solid #2563eb;
+        }
+
+        .train-time {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .train-arrow {
+            color: #94a3b8;
+            margin: 4px 0;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .install-prompt {
+            background: #dbeafe;
+            border: 1px solid #2563eb;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .install-prompt button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .train-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Commute Planner</h1>
+
+        <div id="install-prompt" class="install-prompt" style="display: none;">
+            <span>Add to Home Screen</span>
+            <button id="install-button">Install</button>
+        </div>
+
+        <div class="mode-toggle">
+            <button id="bart-mode-btn" class="active">BART Day</button>
+            <button id="drive-mode-btn">Drive Day</button>
+        </div>
+
+        <!-- BART Mode -->
+        <div id="bart-mode" class="mode-content active">
+            <div class="card">
+                <h2>Commute Details</h2>
+                <div class="input-group">
+                    <label for="bart-drive">Drive to BART (minutes)</label>
+                    <input type="number" id="bart-drive" value="20" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="bart-park">Park + walk to platform (minutes)</label>
+                    <input type="number" id="bart-park" value="5" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="bart-walk">Walk from Montgomery to office (minutes)</label>
+                    <input type="number" id="bart-walk" value="2" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="bart-buffer">Buffer before train (minutes)</label>
+                    <input type="number" id="bart-buffer" value="5" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="bart-prep">Morning prep (minutes)</label>
+                    <input type="number" id="bart-prep" value="30" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="bart-target">Target arrival at office</label>
+                    <input type="time" id="bart-target" value="09:00">
+                </div>
+            </div>
+
+            <div id="bart-error" class="error" style="display: none;"></div>
+
+            <div class="card">
+                <h2>Your Schedule</h2>
+                <div id="bart-timeline" class="timeline"></div>
+            </div>
+
+            <div class="card">
+                <h2>Evening Trains</h2>
+                <div class="train-schedule">
+                    <div class="train-grid" id="evening-trains"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drive Mode -->
+        <div id="drive-mode" class="mode-content">
+            <div class="card">
+                <h2>Commute Details</h2>
+                <div class="input-group">
+                    <label for="drive-drive">Drive to SF (minutes)</label>
+                    <input type="number" id="drive-drive" value="70" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="drive-park">Park + walk to office (minutes)</label>
+                    <input type="number" id="drive-park" value="15" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="drive-prep">Morning prep (minutes)</label>
+                    <input type="number" id="drive-prep" value="30" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="drive-target">Target arrival at office</label>
+                    <input type="time" id="drive-target" value="09:00">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Your Schedule</h2>
+                <div id="drive-timeline" class="timeline"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // BART schedule data
+        const morningTrains = [
+            { depart: '07:15', arrive: '08:16' },
+            { depart: '07:35', arrive: '08:36' },
+            { depart: '07:55', arrive: '08:56' },
+            { depart: '08:15', arrive: '09:16' },
+            { depart: '08:35', arrive: '09:36' }
+        ];
+
+        const eveningTrains = [
+            { depart: '15:47', arrive: '16:49' },
+            { depart: '16:07', arrive: '17:09' },
+            { depart: '16:27', arrive: '17:29' },
+            { depart: '16:47', arrive: '17:49' },
+            { depart: '17:07', arrive: '18:09' },
+            { depart: '17:29', arrive: '18:29' },
+            { depart: '17:49', arrive: '18:49' }
+        ];
+
+        // PWA Setup
+        const manifestData = {
+            name: 'Commute Planner',
+            short_name: 'Commute',
+            start_url: '.',
+            display: 'standalone',
+            background_color: '#f8fafc',
+            theme_color: '#2563eb',
+            description: 'Plan your daily commute',
+            icons: [
+                {
+                    src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%232563eb" width="100" height="100" rx="20"/><text x="50" y="70" font-size="60" text-anchor="middle" fill="white">🚆</text></svg>',
+                    sizes: '512x512',
+                    type: 'image/svg+xml'
+                }
+            ]
+        };
+
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', (e) => {
+                    self.skipWaiting();
+                });
+
+                self.addEventListener('activate', (e) => {
+                    self.clients.claim();
+                });
+
+                self.addEventListener('fetch', (e) => {
+                    e.respondWith(
+                        caches.match(e.request).then((response) => {
+                            return response || fetch(e.request);
+                        })
+                    );
+                });
+            `;
+
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            const swURL = URL.createObjectURL(swBlob);
+
+            navigator.serviceWorker.register(swURL).catch(err => {
+                console.log('Service worker registration failed:', err);
+            });
+        }
+
+        // Install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-prompt').style.display = 'flex';
+        });
+
+        document.getElementById('install-button').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                document.getElementById('install-prompt').style.display = 'none';
+            }
+        });
+
+        // Utility functions
+        function timeToMinutes(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        function minutesToTime(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+        }
+
+        function formatTime(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            return `${displayHours}:${String(minutes).padStart(2, '0')} ${period}`;
+        }
+
+        // Mode switching
+        document.getElementById('bart-mode-btn').addEventListener('click', () => {
+            document.getElementById('bart-mode-btn').classList.add('active');
+            document.getElementById('drive-mode-btn').classList.remove('active');
+            document.getElementById('bart-mode').classList.add('active');
+            document.getElementById('drive-mode').classList.remove('active');
+            localStorage.setItem('mode', 'bart');
+        });
+
+        document.getElementById('drive-mode-btn').addEventListener('click', () => {
+            document.getElementById('drive-mode-btn').classList.add('active');
+            document.getElementById('bart-mode-btn').classList.remove('active');
+            document.getElementById('drive-mode').classList.add('active');
+            document.getElementById('bart-mode').classList.remove('active');
+            localStorage.setItem('mode', 'drive');
+        });
+
+        // BART calculations
+        function calculateBARTSchedule() {
+            const targetArrival = timeToMinutes(document.getElementById('bart-target').value);
+            const walkOffice = parseInt(document.getElementById('bart-walk').value);
+            const driveTime = parseInt(document.getElementById('bart-drive').value);
+            const parkTime = parseInt(document.getElementById('bart-park').value);
+            const buffer = parseInt(document.getElementById('bart-buffer').value);
+            const prep = parseInt(document.getElementById('bart-prep').value);
+
+            const needArriveStation = targetArrival - walkOffice;
+
+            let selectedTrain = null;
+            for (let i = morningTrains.length - 1; i >= 0; i--) {
+                const train = morningTrains[i];
+                const arrivalTime = timeToMinutes(train.arrive);
+                if (arrivalTime <= needArriveStation) {
+                    selectedTrain = train;
+                    break;
+                }
+            }
+
+            if (!selectedTrain) {
+                document.getElementById('bart-error').textContent = 'No train available for your target arrival time. Consider an earlier arrival time.';
+                document.getElementById('bart-error').style.display = 'block';
+                document.getElementById('bart-timeline').innerHTML = '';
+                return;
+            }
+
+            document.getElementById('bart-error').style.display = 'none';
+
+            const trainDepartTime = timeToMinutes(selectedTrain.depart);
+            const trainArriveTime = timeToMinutes(selectedTrain.arrive);
+            const leaveHomeTime = trainDepartTime - buffer - parkTime - driveTime;
+            const wakeUpTime = leaveHomeTime - prep;
+
+            const timeline = [
+                { emoji: '⏰', time: minutesToTime(wakeUpTime), label: 'Wake up' },
+                { emoji: '🏠', time: minutesToTime(leaveHomeTime), label: 'Leave home' },
+                { emoji: '🚗', time: minutesToTime(leaveHomeTime + driveTime), label: 'Arrive at BART station' },
+                { emoji: '🚆', time: selectedTrain.depart, label: 'Board train (Milpitas)' },
+                { emoji: '🏢', time: selectedTrain.arrive, label: 'Arrive Montgomery' },
+                { emoji: '✅', time: minutesToTime(targetArrival), label: 'Arrive at office' }
+            ];
+
+            renderTimeline('bart-timeline', timeline);
+            renderEveningTrains();
+        }
+
+        // Drive calculations
+        function calculateDriveSchedule() {
+            const targetArrival = timeToMinutes(document.getElementById('drive-target').value);
+            const driveTime = parseInt(document.getElementById('drive-drive').value);
+            const parkTime = parseInt(document.getElementById('drive-park').value);
+            const prep = parseInt(document.getElementById('drive-prep').value);
+
+            const leaveHomeTime = targetArrival - driveTime - parkTime;
+            const wakeUpTime = leaveHomeTime - prep;
+
+            const timeline = [
+                { emoji: '⏰', time: minutesToTime(wakeUpTime), label: 'Wake up' },
+                { emoji: '🏠', time: minutesToTime(leaveHomeTime), label: 'Leave home' },
+                { emoji: '🚗', time: minutesToTime(leaveHomeTime + driveTime), label: 'Arrive in SF' },
+                { emoji: '✅', time: minutesToTime(targetArrival), label: 'Arrive at office' }
+            ];
+
+            renderTimeline('drive-timeline', timeline);
+        }
+
+        function renderTimeline(elementId, timeline) {
+            const html = timeline.map(item => `
+                <div class="timeline-item">
+                    <div class="timeline-dot">${item.emoji}</div>
+                    <div class="timeline-content">
+                        <div class="timeline-time">${formatTime(item.time)}</div>
+                        <div class="timeline-label">${item.label}</div>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById(elementId).innerHTML = html;
+        }
+
+        function renderEveningTrains() {
+            const html = eveningTrains.map(train => `
+                <div class="train-card">
+                    <div class="train-time">${formatTime(train.depart)}</div>
+                    <div class="train-arrow">↓</div>
+                    <div class="train-time">${formatTime(train.arrive)}</div>
+                </div>
+            `).join('');
+            document.getElementById('evening-trains').innerHTML = html;
+        }
+
+        // Save/Load state
+        function saveState() {
+            const state = {
+                bartDrive: document.getElementById('bart-drive').value,
+                bartPark: document.getElementById('bart-park').value,
+                bartWalk: document.getElementById('bart-walk').value,
+                bartBuffer: document.getElementById('bart-buffer').value,
+                bartPrep: document.getElementById('bart-prep').value,
+                bartTarget: document.getElementById('bart-target').value,
+                driveDrive: document.getElementById('drive-drive').value,
+                drivePark: document.getElementById('drive-park').value,
+                drivePrep: document.getElementById('drive-prep').value,
+                driveTarget: document.getElementById('drive-target').value
+            };
+            localStorage.setItem('commuteState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const savedState = localStorage.getItem('commuteState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                document.getElementById('bart-drive').value = state.bartDrive || 20;
+                document.getElementById('bart-park').value = state.bartPark || 5;
+                document.getElementById('bart-walk').value = state.bartWalk || 2;
+                document.getElementById('bart-buffer').value = state.bartBuffer || 5;
+                document.getElementById('bart-prep').value = state.bartPrep || 30;
+                document.getElementById('bart-target').value = state.bartTarget || '09:00';
+                document.getElementById('drive-drive').value = state.driveDrive || 70;
+                document.getElementById('drive-park').value = state.drivePark || 15;
+                document.getElementById('drive-prep').value = state.drivePrep || 30;
+                document.getElementById('drive-target').value = state.driveTarget || '09:00';
+            }
+
+            const savedMode = localStorage.getItem('mode');
+            if (savedMode === 'drive') {
+                document.getElementById('drive-mode-btn').click();
+            }
+        }
+
+        // Event listeners
+        document.querySelectorAll('#bart-mode input').forEach(input => {
+            input.addEventListener('input', () => {
+                calculateBARTSchedule();
+                saveState();
+            });
+        });
+
+        document.querySelectorAll('#drive-mode input').forEach(input => {
+            input.addEventListener('input', () => {
+                calculateDriveSchedule();
+                saveState();
+            });
+        });
+
+        // Initialize
+        loadState();
+        calculateBARTSchedule();
+        calculateDriveSchedule();
+    </script>
+</body>
+</html>
