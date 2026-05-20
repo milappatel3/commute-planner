@@ -105,7 +105,8 @@
         }
 
         input[type="number"],
-        input[type="time"] {
+        input[type="time"],
+        input[type="password"] {
             width: 100%;
             padding: 12px;
             border: 1px solid #e2e8f0;
@@ -301,6 +302,100 @@
             max-height: 1000px;
         }
 
+        .current-time {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+
+        .live-train {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .live-train.next {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .live-train.upcoming {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .train-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .train-destination {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .train-countdown {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ef4444;
+        }
+
+        .live-train.upcoming .train-countdown {
+            color: #3b82f6;
+        }
+
+        .train-times {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .train-action {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .live-train.next .train-action {
+            background: #ef4444;
+            color: white;
+        }
+
+        .live-train.upcoming .train-action {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .service-advisory {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            color: #92400e;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .api-status {
+            font-size: 12px;
+            color: #64748b;
+            text-align: center;
+            margin-top: 12px;
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 16px;
@@ -372,15 +467,20 @@
                         <label for="bart-walk">Walk from Montgomery to office (minutes)</label>
                         <input type="number" id="bart-walk" value="2" min="0">
                     </div>
+                    <div class="input-group">
+                        <label for="bart-api-key">BART API Key (for live evening trains)</label>
+                        <input type="password" id="bart-api-key" placeholder="Get free key from api.bart.gov">
+                    </div>
                 </div>
             </div>
 
             <!-- Evening Trains -->
             <div class="card">
                 <h2>Evening Trains</h2>
-                <div class="train-schedule">
-                    <div class="train-grid" id="evening-trains"></div>
-                </div>
+                <div class="current-time" id="current-time">Loading...</div>
+                <div id="service-advisory" style="display: none;" class="service-advisory"></div>
+                <div id="live-evening-trains"></div>
+                <div class="api-status" id="bart-api-status">Connecting to BART API...</div>
             </div>
         </div>
 
@@ -636,6 +736,139 @@
             document.getElementById('evening-trains').innerHTML = html;
         }
 
+        // BART Live API Integration
+        let bartApiTimer = null;
+
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+            const currentTimeEl = document.getElementById('current-time');
+            if (currentTimeEl) {
+                currentTimeEl.textContent = `🕐 Current time: ${timeStr}`;
+            }
+        }
+
+        async function fetchLiveBARTTimes() {
+            const apiKey = document.getElementById('bart-api-key')?.value || localStorage.getItem('bartApiKey');
+
+            if (!apiKey) {
+                document.getElementById('live-evening-trains').innerHTML =
+                    '<p style="text-align: center; color: #64748b; padding: 20px;">Enter BART API key in Details to see live trains</p>';
+                document.getElementById('bart-api-status').textContent = 'No API key configured';
+                return;
+            }
+
+            try {
+                document.getElementById('bart-api-status').textContent = 'Fetching live data...';
+
+                // Milpitas station code: MLPT
+                const url = `https://api.bart.gov/api/etd.aspx?cmd=etd&orig=MLPT&key=${apiKey}&json=y`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.root.message) {
+                    throw new Error(data.root.message.error || 'API Error');
+                }
+
+                displayLiveBARTTimes(data);
+                document.getElementById('bart-api-status').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+            } catch (error) {
+                console.error('BART API error:', error);
+                document.getElementById('bart-api-status').textContent = `Error: ${error.message}`;
+                document.getElementById('live-evening-trains').innerHTML =
+                    `<p style="text-align: center; color: #ef4444; padding: 20px;">⚠️ Could not fetch live data. Check API key.</p>`;
+            }
+        }
+
+        function displayLiveBARTTimes(data) {
+            const now = new Date();
+            const trains = [];
+
+            // Parse BART API response
+            const station = data.root.station[0];
+            if (station.etd) {
+                station.etd.forEach(destination => {
+                    // Only show SF-bound trains (to Montgomery/Downtown SF)
+                    if (destination.destination.includes('San Francisco') ||
+                        destination.destination.includes('SF') ||
+                        destination.destination.includes('Antioch')) {
+
+                        destination.estimate.forEach(est => {
+                            const minutes = est.minutes === 'Leaving' ? 0 : parseInt(est.minutes);
+                            const departTime = new Date(now.getTime() + minutes * 60000);
+
+                            trains.push({
+                                destination: destination.destination,
+                                minutes: minutes,
+                                departTime: departTime,
+                                platform: est.platform,
+                                length: est.length,
+                                color: est.color
+                            });
+                        });
+                    }
+                });
+            }
+
+            // Sort by departure time
+            trains.sort((a, b) => a.minutes - b.minutes);
+
+            // Display trains
+            if (trains.length === 0) {
+                document.getElementById('live-evening-trains').innerHTML =
+                    '<p style="text-align: center; color: #64748b; padding: 20px;">No SF-bound trains found</p>';
+                return;
+            }
+
+            const html = trains.slice(0, 5).map((train, index) => {
+                const isNext = index === 0;
+                const className = isNext ? 'next' : 'upcoming';
+                const minutesText = train.minutes === 0 ? 'Leaving now!' :
+                                   train.minutes === 1 ? 'in 1 minute' :
+                                   `in ${train.minutes} minutes`;
+
+                const timeStr = train.departTime.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+
+                const action = isNext ?
+                    '🏃 Leave office NOW!' :
+                    `✅ You have ${train.minutes} minutes`;
+
+                return `
+                    <div class="live-train ${className}">
+                        <div class="train-header">
+                            <div class="train-destination">${train.destination}</div>
+                            <div class="train-countdown">${minutesText}</div>
+                        </div>
+                        <div class="train-times">
+                            Departs: ${timeStr} • Platform ${train.platform} • ${train.length} cars
+                        </div>
+                        <div class="train-action">${action}</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('live-evening-trains').innerHTML = html;
+        }
+
+        function startBARTUpdates() {
+            // Update current time every second
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+
+            // Fetch BART data immediately and every 30 seconds
+            fetchLiveBARTTimes();
+            if (bartApiTimer) clearInterval(bartApiTimer);
+            bartApiTimer = setInterval(fetchLiveBARTTimes, 30000);
+        }
+
         // Save/Load state
         function saveState() {
             const state = {
@@ -648,9 +881,15 @@
                 driveDrive: document.getElementById('drive-drive').value,
                 drivePark: document.getElementById('drive-park').value,
                 drivePrep: document.getElementById('drive-prep').value,
-                driveTarget: document.getElementById('drive-target').value
+                driveTarget: document.getElementById('drive-target').value,
+                bartApiKey: document.getElementById('bart-api-key')?.value || ''
             };
             localStorage.setItem('commuteState', JSON.stringify(state));
+
+            // Also save API key separately for easy access
+            if (state.bartApiKey) {
+                localStorage.setItem('bartApiKey', state.bartApiKey);
+            }
         }
 
         function loadState() {
@@ -667,6 +906,12 @@
                 document.getElementById('drive-park').value = state.drivePark || 15;
                 document.getElementById('drive-prep').value = state.drivePrep || 30;
                 document.getElementById('drive-target').value = state.driveTarget || '09:00';
+
+                // Load BART API key
+                const bartApiKey = state.bartApiKey || localStorage.getItem('bartApiKey') || '';
+                if (document.getElementById('bart-api-key')) {
+                    document.getElementById('bart-api-key').value = bartApiKey;
+                }
             }
 
             const savedMode = localStorage.getItem('mode');
@@ -705,10 +950,20 @@
             content.classList.toggle('open');
         });
 
+        // BART API key change listener
+        const bartApiKeyInput = document.getElementById('bart-api-key');
+        if (bartApiKeyInput) {
+            bartApiKeyInput.addEventListener('change', () => {
+                saveState();
+                fetchLiveBARTTimes(); // Refresh immediately when API key changes
+            });
+        }
+
         // Initialize
         loadState();
         calculateBARTSchedule();
         calculateDriveSchedule();
+        startBARTUpdates(); // Start live BART updates
     </script>
 </body>
 </html>
