@@ -645,7 +645,7 @@
         });
 
         // BART calculations
-        function calculateBARTSchedule() {
+        async function calculateBARTSchedule() {
             const targetArrival = timeToMinutes(document.getElementById('bart-target').value);
             const walkOffice = parseInt(document.getElementById('bart-walk').value);
             const driveTime = parseInt(document.getElementById('bart-drive').value);
@@ -655,9 +655,13 @@
 
             const needArriveStation = targetArrival - walkOffice;
 
+            // Try to fetch live morning trains
+            const liveTrains = await fetchLiveMorningTrains();
+            const trainsToUse = liveTrains && liveTrains.length > 0 ? liveTrains : morningTrains;
+
             let selectedTrain = null;
-            for (let i = morningTrains.length - 1; i >= 0; i--) {
-                const train = morningTrains[i];
+            for (let i = trainsToUse.length - 1; i >= 0; i--) {
+                const train = trainsToUse[i];
                 const arrivalTime = timeToMinutes(train.arrive);
                 if (arrivalTime <= needArriveStation) {
                     selectedTrain = train;
@@ -679,11 +683,15 @@
             const leaveHomeTime = trainDepartTime - buffer - parkTime - driveTime;
             const wakeUpTime = leaveHomeTime - prep;
 
+            const trainLabel = selectedTrain.isLive ?
+                `Board train (Milpitas) - Live` :
+                `Board train (Milpitas)`;
+
             const timeline = [
                 { emoji: '⏰', time: minutesToTime(wakeUpTime), label: 'Wake up' },
                 { emoji: '🏠', time: minutesToTime(leaveHomeTime), label: 'Leave home' },
                 { emoji: '🚗', time: minutesToTime(leaveHomeTime + driveTime), label: 'Arrive at BART station' },
-                { emoji: '🚆', time: selectedTrain.depart, label: 'Board train (Milpitas)' },
+                { emoji: '🚆', time: selectedTrain.depart, label: trainLabel },
                 { emoji: '🏢', time: selectedTrain.arrive, label: 'Arrive Montgomery' },
                 { emoji: '✅', time: minutesToTime(targetArrival), label: 'Arrive at office' }
             ];
@@ -738,6 +746,8 @@
 
         // BART Live API Integration
         let bartApiTimer = null;
+        let liveMorningTrains = null;
+        let lastMorningFetch = 0;
 
         function updateCurrentTime() {
             const now = new Date();
@@ -749,6 +759,64 @@
             const currentTimeEl = document.getElementById('current-time');
             if (currentTimeEl) {
                 currentTimeEl.textContent = `🕐 Current time: ${timeStr}`;
+            }
+        }
+
+        async function fetchLiveMorningTrains() {
+            const apiKey = document.getElementById('bart-api-key')?.value || localStorage.getItem('bartApiKey');
+            if (!apiKey) return null;
+
+            // Cache for 2 minutes
+            const now = Date.now();
+            if (liveMorningTrains && (now - lastMorningFetch < 120000)) {
+                return liveMorningTrains;
+            }
+
+            try {
+                // Morning trains: Milpitas (MLPT) going to SF
+                const url = `https://api.bart.gov/api/etd.aspx?cmd=etd&orig=MLPT&key=${apiKey}&json=y`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.root.message) {
+                    return null;
+                }
+
+                const trains = [];
+                const station = data.root.station[0];
+                if (station.etd) {
+                    station.etd.forEach(destination => {
+                        // Only SF-bound trains
+                        if (destination.destination.includes('San Francisco') ||
+                            destination.destination.includes('SF') ||
+                            destination.destination.includes('Antioch')) {
+
+                            destination.estimate.forEach(est => {
+                                const minutes = est.minutes === 'Leaving' ? 0 : parseInt(est.minutes);
+                                const currentTime = new Date();
+                                const departTime = new Date(currentTime.getTime() + minutes * 60000);
+
+                                // Estimate arrival (approximately 61 minutes to Montgomery)
+                                const arriveTime = new Date(departTime.getTime() + 61 * 60000);
+
+                                trains.push({
+                                    depart: departTime.toTimeString().slice(0, 5),
+                                    arrive: arriveTime.toTimeString().slice(0, 5),
+                                    minutes: minutes,
+                                    isLive: true,
+                                    color: est.color
+                                });
+                            });
+                        }
+                    });
+                }
+
+                liveMorningTrains = trains;
+                lastMorningFetch = now;
+                return trains;
+            } catch (error) {
+                console.error('Morning train API error:', error);
+                return null;
             }
         }
 
@@ -864,10 +932,17 @@
             updateCurrentTime();
             setInterval(updateCurrentTime, 1000);
 
-            // Fetch BART data immediately and every 30 seconds
+            // Fetch evening trains immediately and every 30 seconds
             fetchLiveBARTTimes();
             if (bartApiTimer) clearInterval(bartApiTimer);
             bartApiTimer = setInterval(fetchLiveBARTTimes, 30000);
+
+            // Also fetch morning trains and refresh schedule every 2 minutes
+            fetchLiveMorningTrains().then(() => calculateBARTSchedule());
+            setInterval(async () => {
+                await fetchLiveMorningTrains();
+                calculateBARTSchedule();
+            }, 120000); // 2 minutes
         }
 
         // Save/Load state
