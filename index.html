@@ -402,6 +402,46 @@
             margin-top: 12px;
         }
 
+        .view-toggle {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .view-toggle-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .view-toggle button {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #64748b;
+        }
+
+        .view-toggle button.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .view-toggle button:hover:not(.active) {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 16px;
@@ -433,6 +473,15 @@
 
         <!-- BART Mode -->
         <div id="bart-mode" class="mode-content active">
+            <!-- View Toggle -->
+            <div class="view-toggle">
+                <span id="view-toggle-label">View:</span>
+                <div class="view-toggle-buttons">
+                    <button id="view-morning-btn" class="active">Morning</button>
+                    <button id="view-evening-btn">Evening</button>
+                </div>
+            </div>
+
             <!-- Morning Section -->
             <div id="morning-section">
                 <!-- Morning Commute Card -->
@@ -583,18 +632,30 @@
         // Service Worker
         if ('serviceWorker' in navigator) {
             const swCode = `
+                const CACHE_VERSION = 'v2';
+
                 self.addEventListener('install', (e) => {
                     self.skipWaiting();
                 });
 
                 self.addEventListener('activate', (e) => {
-                    self.clients.claim();
+                    e.waitUntil(
+                        caches.keys().then(cacheNames => {
+                            return Promise.all(
+                                cacheNames.map(cacheName => {
+                                    if (cacheName !== CACHE_VERSION) {
+                                        return caches.delete(cacheName);
+                                    }
+                                })
+                            );
+                        }).then(() => self.clients.claim())
+                    );
                 });
 
                 self.addEventListener('fetch', (e) => {
                     e.respondWith(
-                        caches.match(e.request).then((response) => {
-                            return response || fetch(e.request);
+                        fetch(e.request).catch(() => {
+                            return caches.match(e.request);
                         })
                     );
                 });
@@ -1078,44 +1139,48 @@
             }
         }
 
-        // Time-based layout adjustment
-        function adjustLayoutBasedOnTime() {
-            const currentHour = new Date().getHours();
-            const isAfternoon = currentHour >= 12; // Noon onwards
+        // View toggle management
+        let currentView = 'morning'; // Track current view
 
-            const morningSection = document.getElementById('morning-section');
-            const eveningSection = document.getElementById('evening-section');
-            const bartMode = document.getElementById('bart-mode');
+        function showMorningView() {
+            currentView = 'morning';
+            document.getElementById('morning-section').style.display = 'block';
+            document.getElementById('evening-section').style.display = 'none';
+            document.getElementById('view-morning-btn').classList.add('active');
+            document.getElementById('view-evening-btn').classList.remove('active');
+            localStorage.setItem('bartView', 'morning');
+        }
+
+        function showEveningView() {
+            currentView = 'evening';
+            document.getElementById('morning-section').style.display = 'none';
+            document.getElementById('evening-section').style.display = 'block';
+            document.getElementById('view-morning-btn').classList.remove('active');
+            document.getElementById('view-evening-btn').classList.add('active');
+            localStorage.setItem('bartView', 'evening');
+        }
+
+        function adjustLayoutBasedOnTime() {
+            // Check if user has manually set a preference
+            const savedView = localStorage.getItem('bartView');
+            if (savedView) {
+                // Respect user's manual choice
+                if (savedView === 'evening') {
+                    showEveningView();
+                } else {
+                    showMorningView();
+                }
+                return;
+            }
+
+            // Otherwise, use time-based default
+            const currentHour = new Date().getHours();
+            const isAfternoon = currentHour >= 12;
 
             if (isAfternoon) {
-                // Afternoon mode: Evening trains first, hide morning schedule
-                morningSection.style.display = 'none';
-
-                // Move evening section to top if not already
-                if (eveningSection && morningSection && eveningSection.previousElementSibling !== null) {
-                    bartMode.insertBefore(eveningSection, bartMode.firstChild.nextSibling); // After details toggle
-                }
-
-                // Add afternoon mode indicator
-                const afternoonBadge = document.createElement('div');
-                afternoonBadge.id = 'afternoon-mode-badge';
-                afternoonBadge.className = 'info-badge';
-                afternoonBadge.style.marginBottom = '16px';
-                afternoonBadge.innerHTML = '🌆 Afternoon mode - Showing evening trains • <a href="#" onclick="document.getElementById(\'morning-section\').style.display=\'block\'; this.parentElement.style.display=\'none\'; return false;" style="color: #1e40af; text-decoration: underline;">Show morning schedule</a>';
-
-                // Only add if not already present
-                if (!document.getElementById('afternoon-mode-badge')) {
-                    bartMode.insertBefore(afternoonBadge, eveningSection);
-                }
+                showEveningView();
             } else {
-                // Morning mode: Normal order, show both sections
-                morningSection.style.display = 'block';
-
-                // Remove afternoon badge if present
-                const afternoonBadge = document.getElementById('afternoon-mode-badge');
-                if (afternoonBadge) {
-                    afternoonBadge.remove();
-                }
+                showMorningView();
             }
         }
 
@@ -1157,6 +1222,10 @@
                 fetchLiveBARTTimes(); // Refresh immediately when API key changes
             });
         }
+
+        // View toggle listeners
+        document.getElementById('view-morning-btn').addEventListener('click', showMorningView);
+        document.getElementById('view-evening-btn').addEventListener('click', showEveningView);
 
         // Initialize
         loadState();
