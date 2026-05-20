@@ -237,143 +237,6 @@
             cursor: pointer;
         }
 
-        .settings-btn {
-            background: white;
-            border: 1px solid #e2e8f0;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #475569;
-            transition: all 0.2s;
-        }
-
-        .settings-btn:hover {
-            border-color: #2563eb;
-            color: #2563eb;
-        }
-
-        .settings-card {
-            display: none;
-        }
-
-        .settings-card.show {
-            display: block;
-        }
-
-        input[type="text"],
-        input[type="password"],
-        select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
-            background: #f8fafc;
-            transition: all 0.2s;
-        }
-
-        select {
-            cursor: pointer;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #1d4ed8;
-        }
-
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-        }
-
-        .btn-secondary:hover {
-            background: #e2e8f0;
-        }
-
-        .info-badge {
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin-top: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .info-badge.success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .info-badge.warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .traffic-status {
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        .refresh-btn {
-            margin-top: 12px;
-        }
-
-        .small-text {
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        .toggle-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .toggle-group button {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #e2e8f0;
-            background: white;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #64748b;
-        }
-
-        .toggle-group button.active {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
-        }
-
         @media (max-width: 480px) {
             .container {
                 padding: 16px;
@@ -396,42 +259,6 @@
         <div id="install-prompt" class="install-prompt" style="display: none;">
             <span>Add to Home Screen</span>
             <button id="install-button">Install</button>
-        </div>
-
-        <button class="settings-btn" id="settings-toggle">
-            ⚙️ Settings
-        </button>
-
-        <div class="card settings-card" id="settings-card">
-            <h2>Google Maps Settings</h2>
-            <div class="input-group">
-                <label for="api-key">Google Maps API Key</label>
-                <input type="password" id="api-key" placeholder="Enter your API key">
-                <div class="small-text">Get your API key from <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></div>
-            </div>
-            <div class="input-group">
-                <label for="home-address">Home Address</label>
-                <input type="text" id="home-address" placeholder="123 Main St, Milpitas, CA">
-            </div>
-            <div class="input-group">
-                <label for="office-address">Office Address</label>
-                <input type="text" id="office-address" placeholder="123 Market St, San Francisco, CA">
-            </div>
-            <div class="input-group">
-                <label for="bart-station-address">BART Station Address (Milpitas)</label>
-                <input type="text" id="bart-station-address" placeholder="400 S Milpitas Blvd, Milpitas, CA">
-            </div>
-            <div class="input-group">
-                <label for="traffic-buffer">Traffic Buffer</label>
-                <select id="traffic-buffer">
-                    <option value="0">No buffer (risky)</option>
-                    <option value="5" selected>+5 minutes (recommended)</option>
-                    <option value="10">+10 minutes (safe)</option>
-                    <option value="15">+15 minutes (very safe)</option>
-                </select>
-            </div>
-            <button class="btn btn-primary" id="save-settings">Save Settings</button>
-            <div id="settings-status" class="info-badge" style="display: none;"></div>
         </div>
 
         <div class="mode-toggle">
@@ -488,25 +315,10 @@
         <div id="drive-mode" class="mode-content">
             <div class="card">
                 <h2>Commute Details</h2>
-
-                <div class="toggle-group">
-                    <button id="manual-mode-btn" class="active">Manual Time</button>
-                    <button id="dynamic-mode-btn">Dynamic (Maps API)</button>
+                <div class="input-group">
+                    <label for="drive-drive">Drive to SF (minutes)</label>
+                    <input type="number" id="drive-drive" value="70" min="0">
                 </div>
-
-                <div id="manual-inputs">
-                    <div class="input-group">
-                        <label for="drive-drive">Drive to SF (minutes)</label>
-                        <input type="number" id="drive-drive" value="70" min="0">
-                    </div>
-                </div>
-
-                <div id="dynamic-status" style="display: none;">
-                    <div id="traffic-info" class="info-badge">
-                        Loading traffic data...
-                    </div>
-                </div>
-
                 <div class="input-group">
                     <label for="drive-park">Park + walk to office (minutes)</label>
                     <input type="number" id="drive-park" value="15" min="0">
@@ -524,12 +336,6 @@
             <div class="card">
                 <h2>Your Schedule</h2>
                 <div id="drive-timeline" class="timeline"></div>
-                <div id="drive-refresh-section" style="display: none;">
-                    <button class="btn btn-secondary refresh-btn" id="refresh-traffic">
-                        🔄 Refresh with live traffic
-                    </button>
-                    <div id="refresh-status" class="info-badge" style="display: none; margin-top: 12px;"></div>
-                </div>
             </div>
         </div>
     </div>
@@ -749,199 +555,6 @@
             document.getElementById('evening-trains').innerHTML = html;
         }
 
-        // Google Maps API integration
-        let isDynamicMode = false;
-        let lastTrafficData = null;
-        let cachedDriveTime = null;
-        let cacheTimestamp = null;
-
-        async function fetchTrafficData(departureTime) {
-            const settings = getSettings();
-
-            if (!settings.apiKey || !settings.homeAddress || !settings.officeAddress) {
-                return null;
-            }
-
-            // Cache for 5 minutes
-            const now = Date.now();
-            if (cachedDriveTime && cacheTimestamp && (now - cacheTimestamp < 5 * 60 * 1000)) {
-                return cachedDriveTime;
-            }
-
-            try {
-                const departureTimestamp = Math.floor(departureTime.getTime() / 1000);
-
-                // Call our Vercel serverless function
-                // This will be deployed at: https://your-project.vercel.app/api/traffic
-                // Or use relative path if same domain: /api/traffic
-                const apiUrl = new URL('/api/traffic', window.location.origin);
-                apiUrl.searchParams.append('origin', settings.homeAddress);
-                apiUrl.searchParams.append('destination', settings.officeAddress);
-                apiUrl.searchParams.append('departure_time', departureTimestamp);
-                apiUrl.searchParams.append('api_key', settings.apiKey);
-
-                const response = await fetch(apiUrl.toString());
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'API request failed');
-                }
-
-                const data = await response.json();
-
-                if (data.status === 'OK' && data.duration_in_traffic) {
-                    const minutes = Math.ceil(data.duration_in_traffic.value / 60);
-
-                    cachedDriveTime = {
-                        minutes: minutes,
-                        withBuffer: minutes + parseInt(settings.buffer),
-                        baseMinutes: minutes,
-                        text: data.duration_in_traffic.text
-                    };
-                    cacheTimestamp = now;
-
-                    return cachedDriveTime;
-                } else {
-                    throw new Error('Invalid API response');
-                }
-            } catch (error) {
-                console.error('Traffic API error:', error);
-                return null;
-            }
-        }
-
-        async function updateDriveTimeWithTraffic() {
-            if (!isDynamicMode) return;
-
-            const targetArrival = timeToMinutes(document.getElementById('drive-target').value);
-            const parkTime = parseInt(document.getElementById('drive-park').value);
-            const prep = parseInt(document.getElementById('drive-prep').value);
-
-            // Estimate departure time (will refine after getting traffic)
-            const estimatedDriveTime = parseInt(document.getElementById('drive-drive').value);
-            const estimatedLeaveTime = targetArrival - estimatedDriveTime - parkTime;
-
-            // Create departure datetime for API
-            const today = new Date();
-            const departureDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            departureDate.setMinutes(estimatedLeaveTime);
-
-            document.getElementById('traffic-info').textContent = 'Fetching traffic data...';
-            document.getElementById('traffic-info').className = 'info-badge';
-
-            const trafficData = await fetchTrafficData(departureDate);
-
-            if (trafficData) {
-                document.getElementById('drive-drive').value = trafficData.withBuffer;
-                lastTrafficData = trafficData;
-
-                const settings = getSettings();
-                const bufferText = settings.buffer > 0 ? ` (includes ${settings.buffer} min buffer)` : '';
-                document.getElementById('traffic-info').textContent = `🚗 ${trafficData.baseMinutes} min drive${bufferText}`;
-                document.getElementById('traffic-info').className = 'info-badge success';
-                document.getElementById('drive-refresh-section').style.display = 'block';
-            } else {
-                document.getElementById('traffic-info').textContent = '⚠️ Could not fetch traffic data. Using manual time.';
-                document.getElementById('traffic-info').className = 'info-badge warning';
-            }
-
-            calculateDriveSchedule();
-        }
-
-        async function refreshTrafficNow() {
-            // Clear cache to force fresh data
-            cachedDriveTime = null;
-            cacheTimestamp = null;
-
-            document.getElementById('refresh-traffic').textContent = '🔄 Refreshing...';
-            document.getElementById('refresh-traffic').disabled = true;
-
-            const now = new Date();
-            const trafficData = await fetchTrafficData(now);
-
-            document.getElementById('refresh-traffic').textContent = '🔄 Refresh with live traffic';
-            document.getElementById('refresh-traffic').disabled = false;
-
-            if (trafficData && lastTrafficData) {
-                const delta = trafficData.baseMinutes - lastTrafficData.baseMinutes;
-                const deltaWithBuffer = trafficData.withBuffer - lastTrafficData.withBuffer;
-
-                let statusText = '';
-                let statusClass = 'info-badge';
-
-                if (delta > 5) {
-                    statusText = `⚠️ Traffic is ${delta} min heavier than planned. Leave ${deltaWithBuffer} min earlier!`;
-                    statusClass = 'info-badge warning';
-                } else if (delta < -5) {
-                    statusText = `✅ Traffic is ${Math.abs(delta)} min lighter. You could leave ${Math.abs(deltaWithBuffer)} min later.`;
-                    statusClass = 'info-badge success';
-                } else {
-                    statusText = `✅ Traffic is about the same as planned.`;
-                    statusClass = 'info-badge success';
-                }
-
-                document.getElementById('refresh-status').textContent = statusText;
-                document.getElementById('refresh-status').className = statusClass;
-                document.getElementById('refresh-status').style.display = 'block';
-
-                // Update drive time with current traffic
-                document.getElementById('drive-drive').value = trafficData.withBuffer;
-                lastTrafficData = trafficData;
-                calculateDriveSchedule();
-            }
-        }
-
-        // Settings management
-        function getSettings() {
-            const settings = localStorage.getItem('mapsSettings');
-            if (settings) {
-                return JSON.parse(settings);
-            }
-            return {
-                apiKey: '',
-                homeAddress: '',
-                officeAddress: '',
-                bartStationAddress: '',
-                buffer: '5'
-            };
-        }
-
-        function saveSettings() {
-            const settings = {
-                apiKey: document.getElementById('api-key').value,
-                homeAddress: document.getElementById('home-address').value,
-                officeAddress: document.getElementById('office-address').value,
-                bartStationAddress: document.getElementById('bart-station-address').value,
-                buffer: document.getElementById('traffic-buffer').value
-            };
-
-            localStorage.setItem('mapsSettings', JSON.stringify(settings));
-
-            document.getElementById('settings-status').textContent = '✅ Settings saved!';
-            document.getElementById('settings-status').className = 'info-badge success';
-            document.getElementById('settings-status').style.display = 'block';
-
-            setTimeout(() => {
-                document.getElementById('settings-status').style.display = 'none';
-            }, 3000);
-
-            // If in dynamic mode, refresh traffic data
-            if (isDynamicMode) {
-                cachedDriveTime = null;
-                cacheTimestamp = null;
-                updateDriveTimeWithTraffic();
-            }
-        }
-
-        function loadSettings() {
-            const settings = getSettings();
-            document.getElementById('api-key').value = settings.apiKey;
-            document.getElementById('home-address').value = settings.homeAddress;
-            document.getElementById('office-address').value = settings.officeAddress;
-            document.getElementById('bart-station-address').value = settings.bartStationAddress;
-            document.getElementById('traffic-buffer').value = settings.buffer;
-        }
-
         // Save/Load state
         function saveState() {
             const state = {
@@ -954,8 +567,7 @@
                 driveDrive: document.getElementById('drive-drive').value,
                 drivePark: document.getElementById('drive-park').value,
                 drivePrep: document.getElementById('drive-prep').value,
-                driveTarget: document.getElementById('drive-target').value,
-                isDynamicMode: isDynamicMode
+                driveTarget: document.getElementById('drive-target').value
             };
             localStorage.setItem('commuteState', JSON.stringify(state));
         }
@@ -974,11 +586,6 @@
                 document.getElementById('drive-park').value = state.drivePark || 15;
                 document.getElementById('drive-prep').value = state.drivePrep || 30;
                 document.getElementById('drive-target').value = state.driveTarget || '09:00';
-
-                isDynamicMode = state.isDynamicMode || false;
-                if (isDynamicMode) {
-                    document.getElementById('dynamic-mode-btn').click();
-                }
             }
 
             const savedMode = localStorage.getItem('mode');
@@ -986,47 +593,6 @@
                 document.getElementById('drive-mode-btn').click();
             }
         }
-
-        // Settings toggle
-        document.getElementById('settings-toggle').addEventListener('click', () => {
-            const settingsCard = document.getElementById('settings-card');
-            settingsCard.classList.toggle('show');
-        });
-
-        // Save settings
-        document.getElementById('save-settings').addEventListener('click', saveSettings);
-
-        // Manual/Dynamic mode toggle
-        document.getElementById('manual-mode-btn').addEventListener('click', () => {
-            isDynamicMode = false;
-            document.getElementById('manual-mode-btn').classList.add('active');
-            document.getElementById('dynamic-mode-btn').classList.remove('active');
-            document.getElementById('manual-inputs').style.display = 'block';
-            document.getElementById('dynamic-status').style.display = 'none';
-            document.getElementById('drive-refresh-section').style.display = 'none';
-            saveState();
-            calculateDriveSchedule();
-        });
-
-        document.getElementById('dynamic-mode-btn').addEventListener('click', () => {
-            const settings = getSettings();
-            if (!settings.apiKey || !settings.homeAddress || !settings.officeAddress) {
-                alert('Please configure Google Maps settings first!');
-                document.getElementById('settings-card').classList.add('show');
-                return;
-            }
-
-            isDynamicMode = true;
-            document.getElementById('dynamic-mode-btn').classList.add('active');
-            document.getElementById('manual-mode-btn').classList.remove('active');
-            document.getElementById('manual-inputs').style.display = 'none';
-            document.getElementById('dynamic-status').style.display = 'block';
-            saveState();
-            updateDriveTimeWithTraffic();
-        });
-
-        // Refresh traffic button
-        document.getElementById('refresh-traffic').addEventListener('click', refreshTrafficNow);
 
         // Event listeners
         document.querySelectorAll('#bart-mode input').forEach(input => {
@@ -1044,18 +610,9 @@
         });
 
         // Initialize
-        loadSettings();
         loadState();
         calculateBARTSchedule();
         calculateDriveSchedule();
-
-        // If dynamic mode and settings are configured, fetch traffic
-        if (isDynamicMode) {
-            const settings = getSettings();
-            if (settings.apiKey && settings.homeAddress && settings.officeAddress) {
-                updateDriveTimeWithTraffic();
-            }
-        }
     </script>
 </body>
 </html>
