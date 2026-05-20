@@ -458,6 +458,20 @@
 
             <!-- Evening Section -->
             <div id="evening-section">
+                <div class="card">
+                    <h2>Evening Trains</h2>
+                    <div class="current-time" id="current-time">Loading...</div>
+                    <div id="service-advisory" style="display: none;" class="service-advisory"></div>
+                    <div id="live-evening-trains"></div>
+                    <div class="api-status" id="bart-api-status">Connecting to BART API...</div>
+                </div>
+            </div>
+
+            <!-- Settings Section (Bottom) -->
+            <button class="details-toggle" id="bart-details-toggle" style="margin-top: 24px; opacity: 0.7;">
+                ⚙️ Settings (Advanced)
+            </button>
+            <div class="details-content" id="bart-details-content">
                 <div class="card" style="margin-top: 0;">
                     <div class="input-group">
                         <label for="bart-prep">Morning prep (minutes)</label>
@@ -480,28 +494,12 @@
                         <input type="number" id="bart-walk" value="2" min="0">
                     </div>
                     <div class="input-group">
-                        <label for="bart-api-key">BART API Key (for live evening trains)</label>
+                        <label for="bart-api-key">BART API Key (for live trains)</label>
                         <input type="password" id="bart-api-key" placeholder="Get free key from api.bart.gov">
                     </div>
                 </div>
             </div>
-
-            <!-- Evening Section -->
-            <div id="evening-section">
-                <div class="card">
-                    <h2>Evening Trains</h2>
-                    <div class="current-time" id="current-time">Loading...</div>
-                    <div id="service-advisory" style="display: none;" class="service-advisory"></div>
-                    <div id="live-evening-trains"></div>
-                    <div class="api-status" id="bart-api-status">Connecting to BART API...</div>
-                </div>
-            </div>
-
-            <!-- Settings Section (Bottom) -->
-            <button class="details-toggle" id="bart-details-toggle" style="margin-top: 24px; opacity: 0.7;">
-                ⚙️ Settings (Advanced)
-            </button>
-            <div class="details-content" id="bart-details-content">
+        </div>
 
         <!-- Drive Mode -->
         <div id="drive-mode" class="mode-content">
