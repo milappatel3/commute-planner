@@ -237,6 +237,70 @@
             cursor: pointer;
         }
 
+        .target-arrival {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .target-arrival label {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #0f172a;
+        }
+
+        .target-arrival input[type="time"] {
+            font-size: 24px;
+            font-weight: 700;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .details-toggle {
+            background: white;
+            border: 1px solid #e2e8f0;
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+
+        .details-toggle:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        .details-toggle::after {
+            content: '▼';
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .details-toggle.open::after {
+            transform: rotate(180deg);
+        }
+
+        .details-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .details-content.open {
+            max-height: 1000px;
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 16px;
@@ -268,41 +332,50 @@
 
         <!-- BART Mode -->
         <div id="bart-mode" class="mode-content active">
-            <div class="card">
-                <h2>Commute Details</h2>
-                <div class="input-group">
-                    <label for="bart-drive">Drive to BART (minutes)</label>
-                    <input type="number" id="bart-drive" value="20" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="bart-park">Park + walk to platform (minutes)</label>
-                    <input type="number" id="bart-park" value="5" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="bart-walk">Walk from Montgomery to office (minutes)</label>
-                    <input type="number" id="bart-walk" value="2" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="bart-buffer">Buffer before train (minutes)</label>
-                    <input type="number" id="bart-buffer" value="5" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="bart-prep">Morning prep (minutes)</label>
-                    <input type="number" id="bart-prep" value="30" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="bart-target">Target arrival at office</label>
-                    <input type="time" id="bart-target" value="09:00">
-                </div>
+            <!-- Target Arrival (Prominent) -->
+            <div class="target-arrival">
+                <label for="bart-target">Target arrival at office</label>
+                <input type="time" id="bart-target" value="09:00">
             </div>
 
             <div id="bart-error" class="error" style="display: none;"></div>
 
+            <!-- Schedule (Main Focus) -->
             <div class="card">
                 <h2>Your Schedule</h2>
                 <div id="bart-timeline" class="timeline"></div>
             </div>
 
+            <!-- Collapsible Details -->
+            <button class="details-toggle" id="bart-details-toggle">
+                Commute Details
+            </button>
+            <div class="details-content" id="bart-details-content">
+                <div class="card" style="margin-top: 0;">
+                    <div class="input-group">
+                        <label for="bart-prep">Morning prep (minutes)</label>
+                        <input type="number" id="bart-prep" value="30" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="bart-drive">Drive to BART (minutes)</label>
+                        <input type="number" id="bart-drive" value="20" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="bart-park">Park + walk to platform (minutes)</label>
+                        <input type="number" id="bart-park" value="5" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="bart-buffer">Buffer before train (minutes)</label>
+                        <input type="number" id="bart-buffer" value="5" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="bart-walk">Walk from Montgomery to office (minutes)</label>
+                        <input type="number" id="bart-walk" value="2" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evening Trains -->
             <div class="card">
                 <h2>Evening Trains</h2>
                 <div class="train-schedule">
@@ -313,29 +386,37 @@
 
         <!-- Drive Mode -->
         <div id="drive-mode" class="mode-content">
-            <div class="card">
-                <h2>Commute Details</h2>
-                <div class="input-group">
-                    <label for="drive-drive">Drive to SF (minutes)</label>
-                    <input type="number" id="drive-drive" value="70" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="drive-park">Park + walk to office (minutes)</label>
-                    <input type="number" id="drive-park" value="15" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="drive-prep">Morning prep (minutes)</label>
-                    <input type="number" id="drive-prep" value="30" min="0">
-                </div>
-                <div class="input-group">
-                    <label for="drive-target">Target arrival at office</label>
-                    <input type="time" id="drive-target" value="09:00">
-                </div>
+            <!-- Target Arrival (Prominent) -->
+            <div class="target-arrival">
+                <label for="drive-target">Target arrival at office</label>
+                <input type="time" id="drive-target" value="09:00">
             </div>
 
+            <!-- Schedule (Main Focus) -->
             <div class="card">
                 <h2>Your Schedule</h2>
                 <div id="drive-timeline" class="timeline"></div>
+            </div>
+
+            <!-- Collapsible Details -->
+            <button class="details-toggle" id="drive-details-toggle">
+                Commute Details
+            </button>
+            <div class="details-content" id="drive-details-content">
+                <div class="card" style="margin-top: 0;">
+                    <div class="input-group">
+                        <label for="drive-prep">Morning prep (minutes)</label>
+                        <input type="number" id="drive-prep" value="30" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="drive-drive">Drive to SF (minutes)</label>
+                        <input type="number" id="drive-drive" value="70" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="drive-park">Park + walk to office (minutes)</label>
+                        <input type="number" id="drive-park" value="15" min="0">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -607,6 +688,21 @@
                 calculateDriveSchedule();
                 saveState();
             });
+        });
+
+        // Details toggle handlers
+        document.getElementById('bart-details-toggle').addEventListener('click', () => {
+            const toggle = document.getElementById('bart-details-toggle');
+            const content = document.getElementById('bart-details-content');
+            toggle.classList.toggle('open');
+            content.classList.toggle('open');
+        });
+
+        document.getElementById('drive-details-toggle').addEventListener('click', () => {
+            const toggle = document.getElementById('drive-details-toggle');
+            const content = document.getElementById('drive-details-content');
+            toggle.classList.toggle('open');
+            content.classList.toggle('open');
         });
 
         // Initialize
